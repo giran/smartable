@@ -1,0 +1,24 @@
+
+@media only screen and (max-width: 40em) {
+
+	/* Table */
+	.table { display: block; position: relative; width: 100%; }
+	.table thead { display: block; float: left; }
+	.table tbody { display: block; width: auto; position: relative; overflow-x: auto; white-space: nowrap; }
+	.table thead tr { display: block; }
+	.table th { display: block; }
+	.table tbody tr { display: inline-block; vertical-align: top; }
+	.table td { display: block; min-height: 1.25em; }
+	.table th.btn-holder {padding-top:11px; padding-bottom:11px;}
+
+	/* sort out borders */
+	.table th { border-bottom: 0; border-top:1px solid #DDD !important; }
+	.table td {  }
+	.table tbody tr {  }
+	.table th:last-child,
+	.table td:last-child {  }
+
+	/* Forms */
+	.form-inline { line-height:35px; }
+	.form-inline * {clear:left;}
+}
