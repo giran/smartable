@@ -1,0 +1,7 @@
+{
+	"list": [
+		{"nome" : "Makoto Hashimoto", "email": "makoto@hashimoto.me"},
+		{"nome" : "Rafael Peruggia", "email": "rafael@peruggia.com"},
+		{"nome" : "Gabriel Benz", "email": "glbenz@gmail.com"}
+	]
+}
