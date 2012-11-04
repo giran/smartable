@@ -3,6 +3,8 @@
 	<head>
 		<title>Smartable</title>
 		<script src="js/jquery-1.8.2.min.js"></script>
+		<script src="js/jquery.tmpl.min.js"></script>
+		<script src="js/jquery.smartable.js"></script>
 		<script src="js/bootstrap.min.js"></script>
 		<link href="css/bootstrap.min.css" rel="stylesheet">
 		<link href="css/smartable.css" rel="stylesheet">
@@ -36,72 +38,21 @@
 						</form>
 
 						<div>
-							<a href="#" class="btn btn-primary"><i class="icon-plus icon-white"></i> New</a>
-							<a href="#" class="btn"><i class="icon-refresh"></i> Refresh</a>
+							<a href="javaScript: void(0);" class="btn btn-primary" onclick="setNewData();"><i class="icon-plus icon-white"></i> New</a>
+							<a href="javaScript: void(0);" class="btn" onclick="$('table.table').smartable('refresh');"><i class="icon-refresh"></i> Refresh</a>
 							<hr />
 						</div>
 
 						<table class="table table-striped">
 							<thead>
 								<tr>
-									<th>Title 1</th>
-									<th>Title 2</th>
-									<th>Title 3</th>
-									<th>Title 4</th>
-									<th>Title 5</th>
-									<th>Title 6</th>
-									<th>Title 7</th>
-									<th>Title 8</th>
+									<th>Nome</th>
+									<th>E-mail</th>
 									<th class="btn-holder">Title 9</th>
 									<th class="btn-holder">Title 10</th>
 								</tr>
 							</thead>
-							<tbody>
-								<tr>
-									<td>Value 1</td>
-									<td>Value 2</td>
-									<td>Value 3</td>
-									<td>Value 4</td>
-									<td>Value 5</td>
-									<td>Value 6</td>
-									<td>Value 7</td>
-									<td>Value 8</td>
-									<td><a href="#" class="btn btn-small"><i class="icon-edit"></i> Edit</a></td>
-									<td>
-										<a class="btn btn-small btn-success" href="#"><i class="icon-ok-sign icon-white"></i> Confirm</a>
-										<a href="#" class="btn btn-small btn-danger"><i class="icon-remove icon-white"></i> Cancel</a>
-									</td>
-								</tr>
-								<tr>
-									<td>Value 1</td>
-									<td>Value 2</td>
-									<td>Value 3</td>
-									<td>Value 4</td>
-									<td>Value 5</td>
-									<td>Value 6</td>
-									<td>Value 7</td>
-									<td>Value 8</td>
-									<td><a href="#" class="btn btn-small"><i class="icon-edit"></i> Edit</a></td>
-									<td>
-										<a class="btn btn-small btn-success" href="#"><i class="icon-ok-sign icon-white"></i> Confirm</a>
-										<a href="#" class="btn btn-small btn-danger"><i class="icon-remove icon-white"></i> Cancel</a>
-									</td>
-								</tr>
-								<tr>
-									<td>Value 1</td>
-									<td>Value 2</td>
-									<td>Value 3</td>
-									<td>Value 4</td>
-									<td>Value 5</td>
-									<td>Value 6</td>
-									<td>Value 7</td>
-									<td>Value 8</td>
-									<td><a href="#" class="btn btn-small"><i class="icon-edit"></i> Edit</a></td>
-									<td>
-										<a class="btn btn-small btn-success" href="#"><i class="icon-ok-sign icon-white"></i> Confirm</a>
-										<a href="#" class="btn btn-small btn-danger"><i class="icon-remove icon-white"></i> Cancel</a>
-									</td>
-								</tr>
+							<tbody>								
 							</tbody>
 						</table>
 
@@ -125,3 +76,27 @@
 		</div>
 	</body>
 </html>
+
+<script id="tmplLista" type="text/x-jquery-tmpl">
+	<tr>
+		<td>{{= nome}}</td>
+		<td>{{= email}}</td>		
+		<td><a href="#" class="btn btn-small"><i class="icon-edit"></i> Edit</a></td>
+		<td>
+			<a class="btn btn-small btn-success" href="#"><i class="icon-ok-sign icon-white"></i> Confirm</a>
+			<a href="#" class="btn btn-small btn-danger"><i class="icon-remove icon-white"></i> Cancel</a>
+		</td>
+	</tr>
+</script>
+
+<script type="text/javascript">
+	function setNewData() {
+		var list = [
+			{"nome" : "Makoto 2", "email" : "makoto.vix@gmail.com"},
+			{"nome" : "Peruca 2", "email" : "peruca@gmail.com"}
+		];
+		$('table.table').smartable("setData", list);
+	}
+
+	$('table.table').smartable({url: "dados.json", template: "#tmplLista"});
+</script>
