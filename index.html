@@ -57,17 +57,7 @@
 						</table>
 
 						<div class="pagination pagination-right">
-							<ul>
-								<li><a href="#">Prev</a></li>
-								<li><a href="#">1</a></li>
-								<li class="disabled"><span>...</span></li>
-								<li><a href="#">28</a></li>
-								<li class="active"><a href="#">29</a></li>
-								<li><a href="#">30</a></li>
-								<li class="disabled"><span>...</span></li>
-								<li><a href="#">876</a></li>
-								<li><a href="#">Next</a></li>
-							</ul>
+							adadasdasd
 						</div>
 
 					</div>
@@ -89,6 +79,8 @@
 	</tr>
 </script>
 
+
+
 <script type="text/javascript">
 	function setNewData() {
 		var list = [
@@ -98,5 +90,9 @@
 		$('table.table').smartable("setData", list);
 	}
 
-	$('table.table').smartable({url: "dados.json", template: "#tmplLista"});
+	$('table.table').smartable({
+		url: "dados.json", 
+		templateList: "#tmplLista", 
+		paginationWrapper: "div.pagination"
+	});
 </script>

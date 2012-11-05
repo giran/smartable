@@ -23,7 +23,10 @@
 			dataType: 'json',
 			page: 1,
 			maxResults: 10,
-			template: null,
+			templateList: null,
+			pagination: true,
+			templatePaginationPath: "includes/pagination.html",
+			paginationWrapper: false,
 			params: null
 		}
 	}
@@ -40,7 +43,16 @@
 				appendTo = this.element.find('tbody');
 			}
 			appendTo.empty();
-			$(this.options.template).tmpl(list).appendTo(appendTo);
+			$(this.options.templateList).tmpl(list).appendTo(appendTo);			
+		},
+
+		createPagination: function(data) {
+			$(this.options.paginationWrapper).empty();
+			
+			$.get(this.options.templatePaginationPath, function(_template) {
+				$.tmpl(_template, data).appendTo($.smartable.options.paginationWrapper);
+			},
+			"html");
 		},
 
 		getData : function() {
@@ -53,6 +65,9 @@
 					if (data) {
 						if ($.isArray(data.list)) {
 							$.smartable.processTemplate(data.list);
+						}
+						if ($.smartable.options.pagination) {
+							$.smartable.createPagination(data);
 						}
 					}
 				},
