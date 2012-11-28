@@ -57,7 +57,9 @@
 						</table>
 
 						<div class="pagination pagination-right">
-							adadasdasd
+							<ul>
+								adadasdasdsdasda
+							</ul>
 						</div>
 
 					</div>
@@ -93,6 +95,7 @@
 	$('table.table').smartable({
 		url: "dados.json", 
 		templateList: "#tmplLista", 
-		paginationWrapper: "div.pagination"
+		paginationWrapper: "div.pagination ul",
+		maxResults: 10
 	});
 </script>
