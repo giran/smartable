@@ -25,7 +25,7 @@
 			maxResults: 10,
 			templateList: null,
 			pagination: true,
-			templatePaginationPath: "includes/pagination.html",
+			paginationTemplate: '<li class="{{= style}}"><a href="javaScript: void(0);" onclick="{{= action}}">{{= label}}</a></li>',
 			paginationWrapper: false,
 			params: null,
 			prevLabel: 'Prev',
@@ -62,22 +62,9 @@
 
 		createPagination: function() {
 			$(this.options.paginationWrapper).empty();
-			var paginationTemplate = null;
+			var paginationTemplate = this.options.paginationTemplate;
 			var prevLabel = this.options.prevLabel;
 			var nextLabel = this.options.nextLabel;
-			
-			$.ajax({
-				url : this.options.templatePaginationPath,
-				method : 'GET',
-				async : false,
-				dataType : 'HTML',
-				error : function (error) {
-					$.error("Pagination template not found");
-				},
-				success : function (_template) {
-					paginationTemplate = _template;
-				}
-			});
 			
 			var totalPages = 1;
 			if (this.data.total > this.options.maxResults) {
