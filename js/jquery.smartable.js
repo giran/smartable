@@ -52,6 +52,14 @@
 			return Math.round(this.data.total / this.options.maxResults);
 		},
 
+		getParameters: function() {
+			var parameters = $.param({"page" : this.options.page, "maxResults" : this.options.maxResults});
+			if (this.options.params) {
+				parameters += '&' + $.param(this.options.params);
+			}
+			return parameters;
+		},
+
 		createPagination: function() {
 			$(this.options.paginationWrapper).empty();
 			var paginationTemplate = null;
@@ -105,7 +113,7 @@
 				url: this.options.url,
 				type: this.options.method,
 				dataType: this.options.dataType,
-				params: this.options.params,
+				data : this.getParameters(),
 				success: function(data) {
 					if (data) {
 						$.smartable.data = data;
