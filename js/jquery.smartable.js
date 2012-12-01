@@ -49,7 +49,7 @@
 		},
 
 		getLastPage: function() {
-			return Math.round(this.data.total / this.options.maxResults);
+			return Math.ceil(this.data.total / this.options.maxResults);
 		},
 
 		getParameters: function() {
@@ -104,11 +104,15 @@
 				success: function(data) {
 					if (data) {
 						$.smartable.data = data;
-						if ($.isArray(data.list)) {
-							$.smartable.processTemplate(data.list);
-						}
-						if ($.smartable.options.pagination) {
-							$.smartable.createPagination();
+						if ($.smartable.options.page > $.smartable.getLastPage()) {
+							$.smartable.gotoPage($.smartable.getLastPage());
+						} else {
+							if ($.isArray(data.list)) {
+								$.smartable.processTemplate(data.list);
+							}
+							if ($.smartable.options.pagination) {
+								$.smartable.createPagination();
+							}
 						}
 					}
 				},
