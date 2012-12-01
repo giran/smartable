@@ -105,7 +105,7 @@
 					if (data) {
 						$.smartable.data = data;
 						if ($.smartable.options.page > $.smartable.getLastPage()) {
-							$.smartable.gotoPage($.smartable.getLastPage());
+							$.smartable.gotoLastPage();
 						} else {
 							if ($.isArray(data.list)) {
 								$.smartable.processTemplate(data.list);
@@ -163,6 +163,14 @@
 					$.error(page + " is not a valid page.")
 				}
 			}
+		},
+
+		gotoFirstPage: function() {
+			this.gotoPage(1);
+		},
+
+		gotoLastPage: function() {
+			this.gotoPage(this.getLastPage());
 		}
 	});
 
