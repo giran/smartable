@@ -28,6 +28,7 @@
 			classOrderIconDesc: "icon-chevron-down",
 			templateList: null,
 			pagination: true,
+			windowSizePagination: 5,
 			paginationTemplate: '<li class="{{= style}}"><a href="javaScript: void(0);" onclick="{{= action}}">{{= label}}</a></li>',
 			paginationWrapper: false,
 			params: {},
@@ -72,6 +73,8 @@
 			var paginationTemplate = this.options.paginationTemplate;
 			var prevLabel = this.options.prevLabel;
 			var nextLabel = this.options.nextLabel;
+			var actualPage = this.options.page;
+			var windowSizePagination = this.options.windowSizePagination;
 			
 			var totalPages = 1;
 			if (this.data.total > this.options.maxResults) {
@@ -79,23 +82,61 @@
 			}
 
 			var paginationArray = new Array();
-			if (this.options.page != 1) {
+			if (actualPage != 1) {
 				paginationArray.push({'label' : prevLabel, 'action' : '$("'+this.element.selector+'").smartable("prevPage")', 'style' : ''});
+				paginationArray.push({'label' : 1, 'action' : '$("'+this.element.selector+'").smartable("gotoPage", '+ 1 +')', 'style' : ''});
 			} else {
 				paginationArray.push({'label' : prevLabel, 'action' : '', 'style' : 'disabled'});
+				paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled'});
 			}
 
-			for (var i = 1; i <= totalPages; i++) {
-				if (i == this.options.page) {
-					paginationArray.push({'label' : this.options.page, 'action' : '', 'style' : 'disabled'});
+			if (((actualPage - Math.floor(windowSizePagination / 2)) > 2) && (totalPages > (windowSizePagination + 2))) {
+				paginationArray.push({'label' : '...', 'action' : '', 'style' : 'disabled'});		
+			}
+
+			var startWindow = 2;
+			var endWindow = totalPages - 1;
+
+			if ((actualPage > (Math.ceil(windowSizePagination / 2) + 1))) {
+				if (actualPage < (totalPages - Math.ceil(windowSizePagination / 2))) {
+					startWindow = actualPage - Math.floor(windowSizePagination / 2);
+					endWindow = actualPage + Math.floor(windowSizePagination / 2);
+				} else if ((totalPages > windowSizePagination))  {
+					if ((totalPages - windowSizePagination) > actualPage) {
+						startWindow = endWindow - Math.ceil(windowSizePagination / 2);
+					} else {
+						startWindow = totalPages - windowSizePagination;
+					}
+				}				
+			} else if (actualPage < (totalPages - Math.ceil(windowSizePagination / 2)) && (totalPages > windowSizePagination)) {
+				if (actualPage < windowSizePagination) {
+					endWindow = 1 + windowSizePagination;
+				} else {
+					endWindow = startWindow + Math.ceil(windowSizePagination / 2);
+				}				
+			}
+
+			for (var i = startWindow; i <= endWindow; i++) {
+				if (i == actualPage) {
+					paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled'});
 				} else {
 					paginationArray.push({'label' : i, 'action' : '$("'+this.element.selector+'").smartable("gotoPage", '+ i +')', 'style' : ''});
 				}
 			}
 
-			if (this.options.page < totalPages) {
+			if ((actualPage + Math.floor(windowSizePagination / 2)) < (totalPages - 1) && (totalPages > (windowSizePagination + 2))) {
+				paginationArray.push({'label' : '...', 'action' : '', 'style' : 'disabled'});		
+			}
+
+			if (actualPage < totalPages) {
+				if (totalPages > 1) {
+					paginationArray.push({'label' : totalPages, 'action' : '$("'+this.element.selector+'").smartable("gotoPage", '+ totalPages +')', 'style' : ''});	
+				}
 				paginationArray.push({'label' : nextLabel, 'action' : '$("'+this.element.selector+'").smartable("nextPage")', 'style' : ''});	
 			} else {
+				if (totalPages > 1) {
+					paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled'});
+				}
 				paginationArray.push({'label' : nextLabel, 'action' : '', 'style' : 'disabled'});	
 			}
 
