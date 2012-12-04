@@ -14,7 +14,6 @@
  */
 
 (function ($) {
-
 	function Smartable() {
 		this.defaults = {
 			debug: false,
@@ -36,13 +35,11 @@
 			nextLabel: 'Next'
 		}
 	}
-
 	$.extend(Smartable.prototype, {
 		setDefaults : function (settings) {
 			this.defaults = $.extend({}, this.defaults, settings);
 			return this;
 		},
-
 		processTemplate: function(list) {
 			var appendTo = this.element;
 			if (this.element.is("table")) {
@@ -51,11 +48,9 @@
 			appendTo.empty();
 			$(this.options.templateList).tmpl(list).appendTo(appendTo);			
 		},
-
 		getLastPage: function() {
 			return Math.ceil(this.data.total / this.options.maxResults);
 		},
-
 		getParameters: function() {
 			var parameters = $.param({
 				"page" : this.options.page, 
@@ -69,11 +64,9 @@
 			}
 			return parameters;
 		},
-
 		setParameter: function(parameterName, parameterValue) {
 			eval("this.options.params." + parameterName + " = '" + parameterValue + "';");
 		},
-
 		createPagination: function() {
 			$(this.options.paginationWrapper).empty();
 			var paginationTemplate = this.options.paginationTemplate;
@@ -108,7 +101,6 @@
 
 			$.tmpl(paginationTemplate, paginationArray).appendTo($.smartable.options.paginationWrapper);
 		},
-
 		getData : function() {			
 			$.ajax({
 				url: this.options.url,
@@ -135,11 +127,9 @@
 				}
 			});
 		},
-
 		setData: function(list) {
 			this.processTemplate(list);
 		},
-
 		init : function(element, settings) {
 			this.options = $.extend({}, this.defaults, settings);
 			this.element = element;
@@ -164,11 +154,9 @@
 
 			this.getData();
 		},
-
 		refresh: function() {
 			this.getData();
 		},
-
 		nextPage : function() {	
 			if (this.options.page < this.getLastPage()) {
 				this.options.page++;
@@ -177,7 +165,6 @@
 				$.error("You're already on the last page.")
 			}	
 		},
-
 		prevPage: function() {
 			if (this.options.page > 1) {
 				this.options.page--;
@@ -186,7 +173,6 @@
 				$.error("You're already on the first page.");
 			}
 		},
-
 		gotoPage: function(page) {
 			if (this.options.page != page) {
 				if (page > 0 && page <= this.getLastPage()) {
@@ -197,15 +183,12 @@
 				}
 			}
 		},
-
 		gotoFirstPage: function() {
 			this.gotoPage(1);
 		},
-
 		gotoLastPage: function() {
 			this.gotoPage(this.getLastPage());
 		},
-
 		changeOrder: function(orderField, orderType) {
 			this.options.orderField = orderField;
 			this.options.orderType = orderType;
