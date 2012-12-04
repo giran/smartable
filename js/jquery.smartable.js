@@ -23,11 +23,15 @@
 			dataType: 'json',
 			page: 1,
 			maxResults: 10,
+			orderField: null,
+			orderType: null,
+			classOrderIconAsc: "icon-chevron-up",
+			classOrderIconDesc: "icon-chevron-down",
 			templateList: null,
 			pagination: true,
 			paginationTemplate: '<li class="{{= style}}"><a href="javaScript: void(0);" onclick="{{= action}}">{{= label}}</a></li>',
 			paginationWrapper: false,
-			params: null,
+			params: {},
 			prevLabel: 'Prev',
 			nextLabel: 'Next'
 		}
@@ -53,11 +57,21 @@
 		},
 
 		getParameters: function() {
-			var parameters = $.param({"page" : this.options.page, "maxResults" : this.options.maxResults});
+			var parameters = $.param({
+				"page" : this.options.page, 
+				"maxResults" : this.options.maxResults, 
+				"orderField" : this.options.orderField, 
+				"orderType" : this.options.orderType
+			});
+
 			if (this.options.params) {
 				parameters += '&' + $.param(this.options.params);
 			}
 			return parameters;
+		},
+
+		setParameter: function(parameterName, parameterValue) {
+			eval("this.options.params." + parameterName + " = '" + parameterValue + "';");
 		},
 
 		createPagination: function() {
@@ -129,6 +143,25 @@
 		init : function(element, settings) {
 			this.options = $.extend({}, this.defaults, settings);
 			this.element = element;
+			var iconAsc = this.options.classOrderIconAsc;
+			var iconDesc = this.options.classOrderIconDesc;
+
+			var iconArrow = ((this.options.orderType == "asc") ? iconAsc  : iconDesc);
+			element.find("[data-orderField]").append("&nbsp;<i></i>");
+			element.find("[data-orderField='"+ this.options.orderField +"']").addClass(this.options.orderType);
+			element.find("[data-orderField='"+ this.options.orderField +"'] i").addClass(iconArrow);
+
+			element.find("[data-orderField]").each(function (i, item) {
+				$(item).click(function () {
+					var orderField = $(this).attr('data-orderField');
+					var orderType = 'asc';
+					if (orderField == $.smartable.options.orderField && $.smartable.options.orderType == 'asc') {
+						orderType = 'desc';
+					} 
+					$.smartable.changeOrder(orderField, orderType);
+				})
+			});
+
 			this.getData();
 		},
 
@@ -171,8 +204,25 @@
 
 		gotoLastPage: function() {
 			this.gotoPage(this.getLastPage());
+		},
+
+		changeOrder: function(orderField, orderType) {
+			this.options.orderField = orderField;
+			this.options.orderType = orderType;
+			var selectorColumn = "[data-orderField='"+ orderField +"']";
+			var iconAsc = this.options.classOrderIconAsc;
+			var iconDesc = this.options.classOrderIconDesc;
+			var iconArrow = iconAsc;
+			if (orderType == 'desc') {
+				iconArrow = iconDesc;
+			}
+			$("[data-orderField]").removeClass('desc').removeClass('asc');
+			$("[data-orderField] i").removeClass(iconDesc).removeClass(iconAsc);
+			$(selectorColumn).addClass(orderType);
+			$(selectorColumn).find("i").addClass(iconArrow);
+			this.refresh();
 		}
-	});
+ 	});
 
 	$.smartable = new Smartable();
 	$.smartable.options = null;
@@ -199,6 +249,23 @@
 		},
 		gotoPage: function(page) {
 			$.smartable.gotoPage(page);
+		},
+		changeOrder: function(orderField, orderType) {
+			$.smartable.changeOrder(orderField, orderType);
+		},
+		setParameter: function(parameter) {
+			var parameterName = null;
+			var parameterValue = null;
+			if ($.type(parameter) == 'object') {
+				parameterName = parameter.attr('name');
+				parameterValue = parameter.val();
+			} else if (arguments.length == 2) {
+				parameterName = arguments[0];
+				parameterValue = arguments[1];
+			} else {
+				$.error("Invalid parameters");
+			}
+			$.smartable.setParameter(parameterName, parameterValue);
 		}
 	};
 
