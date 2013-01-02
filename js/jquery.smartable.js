@@ -32,7 +32,8 @@
 			paginationWrapper: false,
 			params: {},
 			prevLabel: 'Prev',
-			nextLabel: 'Next'
+			nextLabel: 'Next',
+			noDataFoundMessage: 'No data found'
 		}
 	}
 	$.extend(Smartable.prototype, {
@@ -46,7 +47,12 @@
 				appendTo = this.element.find('tbody');
 			}
 			appendTo.empty();
-			$(this.options.templateList).tmpl(list).appendTo(appendTo);			
+			$(".noDataFound").remove();
+			if (list.length > 0) {
+				$(this.options.templateList).tmpl(list).appendTo(appendTo);			
+			} else {
+				this.element.after("<div class='alert alert-info noDataFound'>"+ this.options.noDataFoundMessage  +"</div>");
+			}
 		},
 		getLastPage: function() {
 			return Math.ceil(this.data.total / this.options.maxResults);
@@ -149,8 +155,8 @@
 				data : this.getParameters(),
 				success: function(data) {
 					if (data) {
-						$.smartable.data = data;
-						if ($.smartable.options.page > $.smartable.getLastPage()) {
+						$.smartable.data = data; 
+						if ($.smartable.data.total > 0 && $.smartable.options.page > $.smartable.getLastPage()) {
 							$.smartable.gotoLastPage();
 						} else {
 							if ($.isArray(data.list)) {
