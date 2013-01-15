@@ -15,25 +15,29 @@
 (function ($) {
 	function Smartable() {
 		this.defaults = {
-			debug: false,
-			url: false, //ajax url
-			method: 'GET', // data sending method
-			dataType: 'json',
-			page: 1,
-			maxResults: 10,
-			orderField: null,
-			orderType: null,
-			classOrderIconAsc: "icon-chevron-up",
-			classOrderIconDesc: "icon-chevron-down",
-			templateList: null,
-			pagination: true,
-			windowSizePagination: 5,
-			paginationTemplate: '<li class="{{= style}}"><a href="javaScript: void(0);" onclick="{{= action}}">{{= label}}</a></li>',
-			paginationWrapper: false,
-			params: {},
-			prevLabel: 'Prev',
-			nextLabel: 'Next',
-			noDataFoundMessage: 'No data found'
+			debug:					false,
+			url:					false, //ajax url
+			method:					'GET', // data sending method
+			dataType:				'json',
+			page:					1,
+			maxResults:				10,
+			orderField:				null,
+			orderType:				null,
+			classOrderIconAsc:		"icon-chevron-up",
+			classOrderIconDesc:		"icon-chevron-down",
+			templateList:			null,
+			pagination:				true,
+			windowSizePagination:	5,
+			paginationTemplate:		'<li class="{{= style}}"><a href="javaScript: void(0);" onclick="{{= action}}">{{= label}}</a></li>',
+			paginationWrapper:		false,
+			params:					{},
+			prevLabel:				'Prev',
+			nextLabel:				'Next',
+			noDataFoundMessage:		'No data found',
+			errorFunction:			function (error) { $.error(error); },
+			successFunction:		function(data) {  },
+			autoload:				false,
+			loaderIdentifier:		".smartableLoader"
 		}
 	}
 	$.extend(Smartable.prototype, {
@@ -147,13 +151,18 @@
 
 			$.tmpl(paginationTemplate, paginationArray).appendTo($.smartable.options.paginationWrapper);
 		},
-		getData : function() {			
+		getData : function() {
+			$(this.options.loaderIdentifier).show();
 			$.ajax({
 				url: this.options.url,
 				type: this.options.method,
 				dataType: this.options.dataType,
 				data : this.getParameters(),
 				success: function(data) {
+					$($.smartable.options.loaderIdentifier).hide();
+					if ($.smartable.options.successFunction) {
+						$.smartable.options.successFunction(data);
+					}
 					if (data) {
 						$.smartable.data = data; 
 						if ($.smartable.data.total > 0 && $.smartable.options.page > $.smartable.getLastPage()) {
@@ -168,8 +177,11 @@
 						}
 					}
 				},
-				error: function (error) {
-					$.error(error);
+				error: function(error) {
+					$($.smartable.options.loaderIdentifier).hide();
+					if ($.smartable.options.errorFunction) {
+						$.smartable.options.errorFunction();
+					}
 				}
 			});
 		},
@@ -198,7 +210,9 @@
 				})
 			});
 
-			this.getData();
+			if (this.options.autoload) {
+				this.getData();
+			}
 		},
 		refresh: function() {
 			this.getData();
