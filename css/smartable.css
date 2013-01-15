@@ -12,11 +12,9 @@
 	.table th.btn-holder {padding-top:11px; padding-bottom:11px;}
 
 	/* sort out borders */
-	.table th { border-bottom: 0; border-top:1px solid #DDD !important; }
-	.table td {  }
-	.table tbody tr {  }
-	.table th:last-child,
-	.table td:last-child {  }
+	.table th { border-bottom: 0; border-top:1px solid #DDD !important; background-color:#F3F3F3; border-right:1px solid #FFF !important; }
+	.table tbody { border-left:1px #E3E3E3 solid; }
+	.table tbody tr { border-right:1px solid #E3E3E3; }
 
 	/* Forms */
 	.form-inline { line-height:35px; }
