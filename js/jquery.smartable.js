@@ -35,7 +35,7 @@
 			nextLabel:				'Next',
 			noDataFoundMessage:		'No data found',
 			before: 				function () {},
-			error:					function (error) { $.error(error); },
+			error:					function (jqXHR, ajaxOptions, thrownError) { $.error(jqXHR); },
 			success:				function (data) {  },
 			finaly: 				function () {},
 			autoload:				true
@@ -180,9 +180,9 @@
 						$.smartable.options.finaly();
 					}
 				},
-				error: function(error) {
+				error: function(jqXHR, ajaxOptions, thrownError) {
 					if ($.smartable.options.error) {
-						$.smartable.options.error();
+						$.smartable.options.error(jqXHR, ajaxOptions, thrownError);
 					}
 					if ($.smartable.options.finaly) {
 						$.smartable.options.finaly();
