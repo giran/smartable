@@ -100,10 +100,6 @@
 				paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled'});
 			}
 
-			if (((actualPage - Math.floor(windowSizePagination / 2)) > 2) && (totalPages > (windowSizePagination + 2))) {
-				paginationArray.push({'label' : '...', 'action' : '', 'style' : 'disabled'});		
-			}
-
 			var startWindow = 2;
 			var endWindow = totalPages - 1;
 
@@ -126,6 +122,10 @@
 				}				
 			}
 
+			if ((startWindow - 1) > 1) {
+				paginationArray.push({'label' : '...', 'action' : '', 'style' : 'disabled'});		
+			}
+
 			for (var i = startWindow; i <= endWindow; i++) {
 				if (i == actualPage) {
 					paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled'});
@@ -133,8 +133,8 @@
 					paginationArray.push({'label' : i, 'action' : '$("'+this.element.selector+'").smartable("gotoPage", '+ i +')', 'style' : ''});
 				}
 			}
-
-			if ((actualPage + Math.floor(windowSizePagination / 2)) < (totalPages - 1) && (totalPages > (windowSizePagination + 2))) {
+			
+			if ((totalPages - endWindow) > 1) {
 				paginationArray.push({'label' : '...', 'action' : '', 'style' : 'disabled'});		
 			}
 
