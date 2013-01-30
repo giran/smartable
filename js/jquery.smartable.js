@@ -34,10 +34,11 @@
 			prevLabel:				'Prev',
 			nextLabel:				'Next',
 			noDataFoundMessage:		'No data found',
-			errorFunction:			function (error) { $.error(error); },
-			successFunction:		function(data) {  },
-			autoload:				false,
-			loaderIdentifier:		".smartableLoader"
+			before: 				function () {},
+			error:					function (error) { $.error(error); },
+			success:				function (data) {  },
+			finaly: 				function () {},
+			autoload:				true
 		}
 	}
 	$.extend(Smartable.prototype, {
@@ -152,16 +153,15 @@
 			$.tmpl(paginationTemplate, paginationArray).appendTo($.smartable.options.paginationWrapper);
 		},
 		getData : function() {
-			$(this.options.loaderIdentifier).show();
+			this.options.before();
 			$.ajax({
 				url: this.options.url,
 				type: this.options.method,
 				dataType: this.options.dataType,
 				data : this.getParameters(),
 				success: function(data) {
-					$($.smartable.options.loaderIdentifier).hide();
-					if ($.smartable.options.successFunction) {
-						$.smartable.options.successFunction(data);
+					if ($.smartable.options.success) {
+						$.smartable.options.success(data);
 					}
 					if (data) {
 						$.smartable.data = data; 
@@ -176,11 +176,16 @@
 							}
 						}
 					}
+					if ($.smartable.options.finaly) {
+						$.smartable.options.finaly();
+					}
 				},
 				error: function(error) {
-					$($.smartable.options.loaderIdentifier).hide();
-					if ($.smartable.options.errorFunction) {
-						$.smartable.options.errorFunction();
+					if ($.smartable.options.error) {
+						$.smartable.options.error();
+					}
+					if ($.smartable.options.finaly) {
+						$.smartable.options.finaly();
 					}
 				}
 			});
