@@ -84,12 +84,16 @@
 			var prevLabel = this.options.prevLabel;
 			var nextLabel = this.options.nextLabel;
 			var actualPage = this.options.page;
-			var windowSizePagination = this.options.windowSizePagination;
 			
 			var totalPages = 1;
 			if (this.data.total > this.options.maxResults) {
 				totalPages = this.getLastPage();
 			}
+
+			var windowSizePagination = Math.min(this.options.windowSizePagination, totalPages);
+			var atBegining = actualPage <= windowSizePagination + 1;
+			var atEnding = (actualPage > (totalPages - 1));
+			var needMorePages = (totalPages > (windowSizePagination + 1));
 
 			var paginationArray = new Array();
 			if (actualPage != 1) {
@@ -100,26 +104,20 @@
 				paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled'});
 			}
 
-			var startWindow = 2;
-			var endWindow = totalPages - 1;
+			var startWindow = Math.max((actualPage - Math.floor(windowSizePagination / 2)), 2);
+			var endWindow = Math.min((actualPage + (Math.ceil(windowSizePagination / 2) - 1)), (totalPages - 1));
 
-			if ((actualPage > (Math.ceil(windowSizePagination / 2) + 1))) {
-				if (actualPage < (totalPages - Math.ceil(windowSizePagination / 2))) {
-					startWindow = actualPage - Math.floor(windowSizePagination / 2);
-					endWindow = actualPage + Math.floor(windowSizePagination / 2);
-				} else if ((totalPages > windowSizePagination))  {
-					if ((totalPages - windowSizePagination) > actualPage) {
-						startWindow = endWindow - Math.ceil(windowSizePagination / 2);
-					} else {
-						startWindow = totalPages - windowSizePagination;
-					}
-				}				
-			} else if (actualPage < (totalPages - Math.ceil(windowSizePagination / 2)) && (totalPages > windowSizePagination)) {
-				if (actualPage < windowSizePagination) {
-					endWindow = 1 + windowSizePagination;
-				} else {
-					endWindow = startWindow + Math.ceil(windowSizePagination / 2);
-				}				
+			if (atBegining && needMorePages) {
+				endWindow = (endWindow + (windowSizePagination - actualPage));
+			}
+
+			if (atEnding && needMorePages) {
+				startWindow = (startWindow - (2 - (totalPages - actualPage)));
+			}
+
+			if (!needMorePages) {
+				startWindow = startWindow + 1;
+				endWindow = totalPages;
 			}
 
 			if ((startWindow - 1) > 1) {
