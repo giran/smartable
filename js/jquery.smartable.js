@@ -196,6 +196,7 @@
 		init : function(element, settings) {
 			this.options = $.extend({}, this.defaults, settings);
 			this.element = element;
+			this.options.element = element;
 			var iconAsc = this.options.classOrderIconAsc;
 			var iconDesc = this.options.classOrderIconDesc;
 
