@@ -91,9 +91,9 @@
 			}
 
 			var windowSizePagination = Math.min(this.options.windowSizePagination, totalPages);
-			var atBegining = actualPage <= windowSizePagination + 1;
-			var atEnding = (actualPage > (totalPages - 1));
-			var needMorePages = (totalPages > (windowSizePagination + 1));
+			var atBegining = (actualPage < (windowSizePagination));
+			var atEnding = (actualPage >= (totalPages - 1));
+			var needMorePages = (totalPages > (windowSizePagination + 2));
 
 			var paginationArray = new Array();
 			if (actualPage != 1) {
@@ -106,9 +106,9 @@
 
 			var startWindow = Math.max((actualPage - Math.floor(windowSizePagination / 2)), 2);
 			var endWindow = Math.min((actualPage + (Math.ceil(windowSizePagination / 2) - 1)), (totalPages - 1));
-
+			
 			if (atBegining && needMorePages) {
-				endWindow = (endWindow + (windowSizePagination - actualPage));
+				endWindow = (endWindow + (windowSizePagination - actualPage)) - 1;
 			}
 
 			if (atEnding && needMorePages) {
@@ -116,9 +116,20 @@
 			}
 
 			if (!needMorePages) {
-				startWindow = startWindow + 1;
-				endWindow = totalPages;
+				startWindow = 2;
+				endWindow = totalPages - 1;
 			}
+
+			console.log("windowSizePagination: " + windowSizePagination);
+			console.log("atBegining: " + atBegining);
+			console.log("atEnding: " + atEnding);
+			console.log("needMorePages: " + needMorePages);
+			console.log("actualPage: " + actualPage);
+			console.log("startWindow: " + startWindow);
+			console.log("endWindow: " + endWindow);
+			console.log("totalPages: " + totalPages);
+			//console.log("windowSizePagination: " + windowSizePagination);
+
 
 			if ((startWindow - 1) > 1) {
 				paginationArray.push({'label' : '...', 'action' : '', 'style' : 'disabled'});		
