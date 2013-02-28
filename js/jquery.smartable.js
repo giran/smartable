@@ -15,25 +15,31 @@
 (function ($) {
 	function Smartable() {
 		this.defaults = {
-			debug: false,
-			url: false, //ajax url
-			method: 'GET', // data sending method
-			dataType: 'json',
-			page: 1,
-			maxResults: 10,
-			orderField: null,
-			orderType: null,
-			classOrderIconAsc: "icon-chevron-up",
-			classOrderIconDesc: "icon-chevron-down",
-			templateList: null,
-			pagination: true,
-			windowSizePagination: 5,
-			paginationTemplate: '<li class="{{= style}}"><a href="javaScript: void(0);" onclick="{{= action}}">{{= label}}</a></li>',
-			paginationWrapper: false,
-			params: {},
-			prevLabel: 'Prev',
-			nextLabel: 'Next',
-			noDataFoundMessage: 'No data found'
+			debug:					false,
+			url:					false, //ajax url
+			method:					'GET', // data sending method
+			dataType:				'json',
+			page:					1,
+			maxResults:				10,
+			orderField:				null,
+			orderType:				null,
+			classOrderIconAsc:		"icon-chevron-up",
+			classOrderIconDesc:		"icon-chevron-down",
+			templateList:			null,
+			targetList: 			null,
+			pagination:				true,
+			windowSizePagination:	5,
+			paginationTemplate:		'<li class="{{= style}}"><a href="javaScript: void(0);" onclick="{{= action}}">{{= label}}</a></li>',
+			paginationWrapper:		false,
+			params:					{},
+			prevLabel:				'Prev',
+			nextLabel:				'Next',
+			noDataFoundMessage:		'No data found',
+			before: 				function () {},
+			error:					function (jqXHR, ajaxOptions, thrownError) { $.error(jqXHR); },
+			success:				function (data) {  },
+			finaly: 				function () {},
+			autoload:				true
 		}
 	}
 	$.extend(Smartable.prototype, {
@@ -41,11 +47,19 @@
 			this.defaults = $.extend({}, this.defaults, settings);
 			return this;
 		},
-		processTemplate: function(list) {
+		getTargetList: function() {
 			var appendTo = this.element;
-			if (this.element.is("table")) {
-				appendTo = this.element.find('tbody');
+			if (this.options.targetList) {
+				appendTo = $(this.options.targetList);
+			} else {
+				if (this.element.is("table")) {
+					appendTo = this.element.find('tbody');
+				}
 			}
+			return appendTo;
+		},
+		processTemplate: function(list) {
+			var appendTo = this.getTargetList();
 			appendTo.empty();
 			$(".noDataFound").remove();
 			if (list.length > 0) {
@@ -79,12 +93,16 @@
 			var prevLabel = this.options.prevLabel;
 			var nextLabel = this.options.nextLabel;
 			var actualPage = this.options.page;
-			var windowSizePagination = this.options.windowSizePagination;
 			
 			var totalPages = 1;
 			if (this.data.total > this.options.maxResults) {
 				totalPages = this.getLastPage();
 			}
+
+			var windowSizePagination = Math.min(this.options.windowSizePagination, totalPages);
+			var atBegining = (actualPage < (windowSizePagination));
+			var atEnding = (actualPage >= (totalPages - 1));
+			var needMorePages = (totalPages > (windowSizePagination + 2));
 
 			var paginationArray = new Array();
 			if (actualPage != 1) {
@@ -95,30 +113,35 @@
 				paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled'});
 			}
 
-			if (((actualPage - Math.floor(windowSizePagination / 2)) > 2) && (totalPages > (windowSizePagination + 2))) {
-				paginationArray.push({'label' : '...', 'action' : '', 'style' : 'disabled'});		
+			var startWindow = Math.max((actualPage - Math.floor(windowSizePagination / 2)), 2);
+			var endWindow = Math.min((actualPage + (Math.ceil(windowSizePagination / 2) - 1)), (totalPages - 1));
+			
+			if (atBegining && needMorePages) {
+				endWindow = (endWindow + (windowSizePagination - actualPage)) - 1;
 			}
 
-			var startWindow = 2;
-			var endWindow = totalPages - 1;
+			if (atEnding && needMorePages) {
+				startWindow = (startWindow - (2 - (totalPages - actualPage)));
+			}
 
-			if ((actualPage > (Math.ceil(windowSizePagination / 2) + 1))) {
-				if (actualPage < (totalPages - Math.ceil(windowSizePagination / 2))) {
-					startWindow = actualPage - Math.floor(windowSizePagination / 2);
-					endWindow = actualPage + Math.floor(windowSizePagination / 2);
-				} else if ((totalPages > windowSizePagination))  {
-					if ((totalPages - windowSizePagination) > actualPage) {
-						startWindow = endWindow - Math.ceil(windowSizePagination / 2);
-					} else {
-						startWindow = totalPages - windowSizePagination;
-					}
-				}				
-			} else if (actualPage < (totalPages - Math.ceil(windowSizePagination / 2)) && (totalPages > windowSizePagination)) {
-				if (actualPage < windowSizePagination) {
-					endWindow = 1 + windowSizePagination;
-				} else {
-					endWindow = startWindow + Math.ceil(windowSizePagination / 2);
-				}				
+			if (!needMorePages) {
+				startWindow = 2;
+				endWindow = totalPages - 1;
+			}
+
+			console.log("windowSizePagination: " + windowSizePagination);
+			console.log("atBegining: " + atBegining);
+			console.log("atEnding: " + atEnding);
+			console.log("needMorePages: " + needMorePages);
+			console.log("actualPage: " + actualPage);
+			console.log("startWindow: " + startWindow);
+			console.log("endWindow: " + endWindow);
+			console.log("totalPages: " + totalPages);
+			//console.log("windowSizePagination: " + windowSizePagination);
+
+
+			if ((startWindow - 1) > 1) {
+				paginationArray.push({'label' : '...', 'action' : '', 'style' : 'disabled'});		
 			}
 
 			for (var i = startWindow; i <= endWindow; i++) {
@@ -128,8 +151,8 @@
 					paginationArray.push({'label' : i, 'action' : '$("'+this.element.selector+'").smartable("gotoPage", '+ i +')', 'style' : ''});
 				}
 			}
-
-			if ((actualPage + Math.floor(windowSizePagination / 2)) < (totalPages - 1) && (totalPages > (windowSizePagination + 2))) {
+			
+			if ((totalPages - endWindow) > 1) {
 				paginationArray.push({'label' : '...', 'action' : '', 'style' : 'disabled'});		
 			}
 
@@ -147,13 +170,17 @@
 
 			$.tmpl(paginationTemplate, paginationArray).appendTo($.smartable.options.paginationWrapper);
 		},
-		getData : function() {			
+		getData : function() {
+			this.options.before();
 			$.ajax({
 				url: this.options.url,
 				type: this.options.method,
 				dataType: this.options.dataType,
 				data : this.getParameters(),
 				success: function(data) {
+					if ($.smartable.options.success) {
+						$.smartable.options.success(data);
+					}
 					if (data) {
 						$.smartable.data = data; 
 						if ($.smartable.data.total > 0 && $.smartable.options.page > $.smartable.getLastPage()) {
@@ -167,9 +194,17 @@
 							}
 						}
 					}
+					if ($.smartable.options.finaly) {
+						$.smartable.options.finaly();
+					}
 				},
-				error: function (error) {
-					$.error(error);
+				error: function(jqXHR, ajaxOptions, thrownError) {
+					if ($.smartable.options.error) {
+						$.smartable.options.error(jqXHR, ajaxOptions, thrownError);
+					}
+					if ($.smartable.options.finaly) {
+						$.smartable.options.finaly();
+					}
 				}
 			});
 		},
@@ -179,6 +214,7 @@
 		init : function(element, settings) {
 			this.options = $.extend({}, this.defaults, settings);
 			this.element = element;
+			this.options.element = element;
 			var iconAsc = this.options.classOrderIconAsc;
 			var iconDesc = this.options.classOrderIconDesc;
 
@@ -198,7 +234,9 @@
 				})
 			});
 
-			this.getData();
+			if (this.options.autoload) {
+				this.getData();
+			}
 		},
 		refresh: function() {
 			this.getData();
