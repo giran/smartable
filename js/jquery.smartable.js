@@ -26,6 +26,7 @@
 			classOrderIconAsc:		"icon-chevron-up",
 			classOrderIconDesc:		"icon-chevron-down",
 			templateList:			null,
+			targetList: 			null,
 			pagination:				true,
 			windowSizePagination:	5,
 			paginationTemplate:		'<li class="{{= style}}"><a href="javaScript: void(0);" onclick="{{= action}}">{{= label}}</a></li>',
@@ -46,11 +47,19 @@
 			this.defaults = $.extend({}, this.defaults, settings);
 			return this;
 		},
-		processTemplate: function(list) {
+		getTargetList: function() {
 			var appendTo = this.element;
-			if (this.element.is("table")) {
-				appendTo = this.element.find('tbody');
+			if (this.options.targetList) {
+				appendTo = $(this.options.targetList);
+			} else {
+				if (this.element.is("table")) {
+					appendTo = this.element.find('tbody');
+				}
 			}
+			return appendTo;
+		},
+		processTemplate: function(list) {
+			var appendTo = this.getTargetList();
 			appendTo.empty();
 			$(".noDataFound").remove();
 			if (list.length > 0) {
