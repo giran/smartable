@@ -129,17 +129,6 @@
 				endWindow = totalPages - 1;
 			}
 
-			console.log("windowSizePagination: " + windowSizePagination);
-			console.log("atBegining: " + atBegining);
-			console.log("atEnding: " + atEnding);
-			console.log("needMorePages: " + needMorePages);
-			console.log("actualPage: " + actualPage);
-			console.log("startWindow: " + startWindow);
-			console.log("endWindow: " + endWindow);
-			console.log("totalPages: " + totalPages);
-			//console.log("windowSizePagination: " + windowSizePagination);
-
-
 			if ((startWindow - 1) > 1) {
 				paginationArray.push({'label' : '...', 'action' : '', 'style' : 'disabled'});		
 			}
@@ -177,23 +166,11 @@
 				type: this.options.method,
 				dataType: this.options.dataType,
 				data : this.getParameters(),
-				success: function(data) {
+				success: function(data) {					
 					if ($.smartable.options.success) {
 						$.smartable.options.success(data);
 					}
-					if (data) {
-						$.smartable.data = data; 
-						if ($.smartable.data.total > 0 && $.smartable.options.page > $.smartable.getLastPage()) {
-							$.smartable.gotoLastPage();
-						} else {
-							if ($.isArray(data.list)) {
-								$.smartable.processTemplate(data.list);
-							}
-							if ($.smartable.options.pagination) {
-								$.smartable.createPagination();
-							}
-						}
-					}
+					$.smartable.setData(data);
 					if ($.smartable.options.finaly) {
 						$.smartable.options.finaly();
 					}
@@ -208,8 +185,20 @@
 				}
 			});
 		},
-		setData: function(list) {
-			this.processTemplate(list);
+		setData: function(data) {
+			if (data) {
+				this.data = data; 
+				if (this.data.total > 0 && this.options.page > this.getLastPage()) {
+					this.gotoLastPage();
+				} else {
+					if ($.isArray(data.list)) {
+						this.processTemplate(data.list);
+					}
+					if (this.options.pagination) {
+						this.createPagination();
+					}
+				}
+			}
 		},
 		init : function(element, settings) {
 			this.options = $.extend({}, this.defaults, settings);
