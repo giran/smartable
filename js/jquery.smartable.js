@@ -33,13 +33,16 @@
 			paginationWrapper:		false,
 			params:					{},
 			prevLabel:				'Prev',
+			prevClass:				'ant',
 			nextLabel:				'Next',
+			nextClass:				'prox',
 			noDataFoundMessage:		'No data found',
 			before: 				function () {},
 			error:					function (jqXHR, ajaxOptions, thrownError) { $.error(jqXHR); },
 			success:				function (data) {  },
 			finaly: 				function () {},
-			autoload:				true
+			autoload:				true,
+			dataLoader:				null
 		}
 	}
 	$.extend(Smartable.prototype, {
@@ -62,10 +65,12 @@
 			var appendTo = this.getTargetList();
 			appendTo.empty();
 			$(".noDataFound").remove();
+			$(this.options.paginationWrapper).show();
 			if (list.length > 0) {
-				$(this.options.templateList).tmpl(list).appendTo(appendTo);			
+				$(this.options.templateList).tmpl(list).appendTo(appendTo);
 			} else {
 				this.element.after("<div class='alert alert-info noDataFound'>"+ this.options.noDataFoundMessage  +"</div>");
+				$(this.options.paginationWrapper).hide();
 			}
 		},
 		getLastPage: function() {
@@ -91,7 +96,9 @@
 			$(this.options.paginationWrapper).empty();
 			var paginationTemplate = this.options.paginationTemplate;
 			var prevLabel = this.options.prevLabel;
+			var prevClass = this.options.prevClass;
 			var nextLabel = this.options.nextLabel;
+			var nextClass = this.options.nextClass;
 			var actualPage = this.options.page;
 			
 			var totalPages = 1;
@@ -106,11 +113,11 @@
 
 			var paginationArray = new Array();
 			if (actualPage != 1) {
-				paginationArray.push({'label' : prevLabel, 'action' : '$("'+this.element.selector+'").smartable("prevPage")', 'style' : ''});
-				paginationArray.push({'label' : 1, 'action' : '$("'+this.element.selector+'").smartable("gotoPage", '+ 1 +')', 'style' : ''});
+				paginationArray.push({'label' : prevLabel, 'action' : 'jQuery("'+this.element.selector+'").smartable("prevPage")', 'style' : prevClass});
+				paginationArray.push({'label' : 1, 'action' : 'jQuery("'+this.element.selector+'").smartable("gotoPage", '+ 1 +')', 'style' : ''});
 			} else {
-				paginationArray.push({'label' : prevLabel, 'action' : '', 'style' : 'disabled'});
-				paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled'});
+				paginationArray.push({'label' : prevLabel, 'action' : '', 'style' : 'disabled ' + prevClass});
+				paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled active'});
 			}
 
 			var startWindow = Math.max((actualPage - Math.floor(windowSizePagination / 2)), 2);
@@ -135,9 +142,9 @@
 
 			for (var i = startWindow; i <= endWindow; i++) {
 				if (i == actualPage) {
-					paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled'});
+					paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled active'});
 				} else {
-					paginationArray.push({'label' : i, 'action' : '$("'+this.element.selector+'").smartable("gotoPage", '+ i +')', 'style' : ''});
+					paginationArray.push({'label' : i, 'action' : 'jQuery("'+this.element.selector+'").smartable("gotoPage", '+ i +')', 'style' : ''});
 				}
 			}
 			
@@ -147,33 +154,46 @@
 
 			if (actualPage < totalPages) {
 				if (totalPages > 1) {
-					paginationArray.push({'label' : totalPages, 'action' : '$("'+this.element.selector+'").smartable("gotoPage", '+ totalPages +')', 'style' : ''});	
+					paginationArray.push({'label' : totalPages, 'action' : 'jQuery("'+this.element.selector+'").smartable("gotoPage", '+ totalPages +')', 'style' : ''});	
 				}
-				paginationArray.push({'label' : nextLabel, 'action' : '$("'+this.element.selector+'").smartable("nextPage")', 'style' : ''});	
+				paginationArray.push({'label' : nextLabel, 'action' : 'jQuery("'+this.element.selector+'").smartable("nextPage")', 'style' : nextClass});
 			} else {
 				if (totalPages > 1) {
-					paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled'});
+					paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled active'});
 				}
-				paginationArray.push({'label' : nextLabel, 'action' : '', 'style' : 'disabled'});	
+				paginationArray.push({'label' : nextLabel, 'action' : '', 'style' : 'disabled ' + nextClass});
 			}
 
 			$.tmpl(paginationTemplate, paginationArray).appendTo($.smartable.options.paginationWrapper);
 		},
 		getData : function() {
 			this.options.before();
+			if ($.isFunction(this.options.dataLoader)) {
+				this.options.dataLoader(this.options.page, this.options.maxResults, this.options.orderField, this.options.orderType, function (data) {
+					$.smartable.successReturn(data);
+				});
+			} else {
+				this.getDataAjax();
+			}
+			
+		},
+		successReturn: function (data) {
+			if ($.smartable.options.success) {
+				$.smartable.options.success(data);
+			}
+			$.smartable.setData(data);
+			if ($.smartable.options.finaly) {
+				$.smartable.options.finaly();
+			}
+		},
+		getDataAjax: function() {
 			$.ajax({
 				url: this.options.url,
 				type: this.options.method,
 				dataType: this.options.dataType,
 				data : this.getParameters(),
-				success: function(data) {					
-					if ($.smartable.options.success) {
-						$.smartable.options.success(data);
-					}
-					$.smartable.setData(data);
-					if ($.smartable.options.finaly) {
-						$.smartable.options.finaly();
-					}
+				success: function(data) {
+					$.smartable.successReturn(data);
 				},
 				error: function(jqXHR, ajaxOptions, thrownError) {
 					if ($.smartable.options.error) {
