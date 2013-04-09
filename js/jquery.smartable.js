@@ -15,34 +15,35 @@
 (function ($) {
 	function Smartable() {
 		this.defaults = {
-			debug:					false,
-			url:					false, //ajax url
-			method:					'GET', // data sending method
-			dataType:				'json',
-			page:					1,
-			maxResults:				10,
-			orderField:				null,
-			orderType:				null,
-			classOrderIconAsc:		"icon-chevron-up",
-			classOrderIconDesc:		"icon-chevron-down",
-			templateList:			null,
-			targetList: 			null,
-			pagination:				true,
-			windowSizePagination:	5,
-			paginationTemplate:		'<li class="{{= style}}"><a href="javaScript: void(0);" onclick="{{= action}}">{{= label}}</a></li>',
-			paginationWrapper:		false,
-			params:					{},
-			prevLabel:				'Prev',
-			prevClass:				'ant',
-			nextLabel:				'Next',
-			nextClass:				'prox',
-			noDataFoundMessage:		'No data found',
-			before: 				function () {},
-			error:					function (jqXHR, ajaxOptions, thrownError) { $.error(jqXHR); },
-			success:				function (data) {  },
-			finaly: 				function () {},
-			autoload:				true,
-			dataLoader:				null
+			debug:						false,
+			url:						false, //ajax url
+			method:						'GET', // data sending method
+			dataType:					'json',
+			page:						1,
+			maxResults:					10,
+			orderField:					null,
+			orderType:					null,
+			classOrderIconAsc:			"icon-chevron-up",
+			classOrderIconDesc:			"icon-chevron-down",
+			templateList:				null,
+			targetList: 				null,
+			pagination:					true,
+			hidePaginationWithOnePage:	false,
+			windowSizePagination:		5,
+			paginationTemplate:			'<li class="{{= style}}"><a href="javaScript: void(0);" onclick="{{= action}}">{{= label}}</a></li>',
+			paginationWrapper:			false,
+			params:						{},
+			prevLabel:					'Prev',
+			prevClass:					'ant',
+			nextLabel:					'Next',
+			nextClass:					'prox',
+			noDataFoundMessage:			'No data found',
+			before: 					function () {},
+			error:						function (jqXHR, ajaxOptions, thrownError) { $.error(jqXHR); },
+			success:					function (data) {  },
+			finaly: 					function () {},
+			autoload:					true,
+			dataLoader:					null
 		}
 	}
 	$.extend(Smartable.prototype, {
@@ -106,6 +107,10 @@
 				totalPages = this.getLastPage();
 			}
 
+			if (this.options.hidePaginationWithOnePage && totalPages == 1) {
+				return;
+			}
+			
 			var windowSizePagination = Math.min(this.options.windowSizePagination, totalPages);
 			var atBegining = (actualPage < (windowSizePagination));
 			var atEnding = (actualPage >= (totalPages - 1));
