@@ -37,6 +37,7 @@
 			prevClass:					'ant',
 			nextLabel:					'Next',
 			nextClass:					'prox',
+			activeClass:				'active',
 			noDataFoundMessage:			'No data found',
 			before: 					function () {},
 			error:						function (jqXHR, ajaxOptions, thrownError) { $.error(jqXHR); },
@@ -101,6 +102,7 @@
 			var nextLabel = this.options.nextLabel;
 			var nextClass = this.options.nextClass;
 			var actualPage = this.options.page;
+			var activeClass = this.options.activeClass;
 			
 			var totalPages = 1;
 			if (this.data.total > this.options.maxResults) {
@@ -122,7 +124,7 @@
 				paginationArray.push({'label' : 1, 'action' : 'jQuery("'+this.element.selector+'").smartable("gotoPage", '+ 1 +')', 'style' : ''});
 			} else {
 				paginationArray.push({'label' : prevLabel, 'action' : '', 'style' : 'disabled ' + prevClass});
-				paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled active'});
+				paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled ' + activeClass});
 			}
 
 			var startWindow = Math.max((actualPage - Math.floor(windowSizePagination / 2)), 2);
@@ -147,7 +149,7 @@
 
 			for (var i = startWindow; i <= endWindow; i++) {
 				if (i == actualPage) {
-					paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled active'});
+					paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled ' + activeClass});
 				} else {
 					paginationArray.push({'label' : i, 'action' : 'jQuery("'+this.element.selector+'").smartable("gotoPage", '+ i +')', 'style' : ''});
 				}
@@ -164,7 +166,7 @@
 				paginationArray.push({'label' : nextLabel, 'action' : 'jQuery("'+this.element.selector+'").smartable("nextPage")', 'style' : nextClass});
 			} else {
 				if (totalPages > 1) {
-					paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled active'});
+					paginationArray.push({'label' : actualPage, 'action' : '', 'style' : 'disabled ' + activeClass});
 				}
 				paginationArray.push({'label' : nextLabel, 'action' : '', 'style' : 'disabled ' + nextClass});
 			}
